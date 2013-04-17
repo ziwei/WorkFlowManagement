@@ -35,6 +35,9 @@ public class ValueMatcher {
 				Automaton intersec = BasicOperations.intersection(ToAutomaton(output), ToAutomaton(input));
 				return (intersec.getNumberOfTransitions()>0) ? implies : notImplies;
 			}
+			else if (input.operator.equals("ALL")){
+				return implies;
+			}
 		}
 		else if (output.operator.equals("~")){
 			//System.out.println("OK till here2");
@@ -63,6 +66,9 @@ public class ValueMatcher {
 				Automaton intersec = BasicOperations.intersection(ToAutomaton(output), ToAutomaton(input));
 				return (intersec.getNumberOfTransitions()>0) ? implies : notImplies;
 			}
+			else if (input.operator.equals("ALL")){
+				return implies;
+			}
 		}
 		else if (output.operator.equals("<")){
 			if (input.operator.equals("=")){
@@ -84,6 +90,9 @@ public class ValueMatcher {
 				Automaton i = ToAutomaton(input);
 				String minStr = MinString(i, LIMIT);
 				return output.value.compareTo(minStr)>0 ? implies : notImplies;
+			}
+			else if (input.operator.equals("ALL")){
+				return implies;
 			}
 		}
 		else if (output.operator.equals("<=")){
@@ -107,6 +116,9 @@ public class ValueMatcher {
 				String minStr = MinString(i, LIMIT);
 				return output.value.compareTo(minStr)>-1 ? implies : notImplies;
 			}
+			else if (input.operator.equals("ALL")){
+				return implies;
+			}
 		}
 		else if (output.operator.equals(">")){
 			if (input.operator.equals("=")){
@@ -128,6 +140,9 @@ public class ValueMatcher {
 				Automaton i = ToAutomaton(input);
 				String maxStr = MaxString(i, LIMIT);
 				return output.value.compareTo(maxStr)<0 ? implies : notImplies;
+			}
+			else if (input.operator.equals("ALL")){
+				return implies;
 			}
 		}
 		else if (output.operator.equals(">=")){
@@ -151,7 +166,11 @@ public class ValueMatcher {
 				String maxStr = MaxString(i, LIMIT);
 				return output.value.compareTo(maxStr)<1 ? implies : notImplies;
 			}
+			else if (input.operator.equals("ALL")){
+				return implies;
+			}
 		}
+		else if (output.operator.equals("ALL")) return implies;
 		
 		return null;
 	}

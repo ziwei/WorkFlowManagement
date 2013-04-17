@@ -23,6 +23,7 @@ public class ExpressionMatcher {
 	
 	public Map Prove(Formula[] axioms, String l, String r) throws IllegalArgumentException, ParseException{
 		Map res = new HashMap();
+		System.out.println(l+" "+r);
 		String[] CFs = DNFSplit((Formula)logic.createExpression(l));
 		Formula right = (Formula)logic.createExpression(r);
 		//Formula fal = (Formula)logic.createExpression("false");
@@ -54,7 +55,7 @@ public class ExpressionMatcher {
 		//return logic.inference().infer(statements.toArray(new Formula[statements.size()]), fImpl);
 		return res;
 	}
-	public Formula[] AxiomsGen(List output, List input) throws IllegalArgumentException, ParseException{
+	public Formula[] AxiomsGen(List<Attribute> output, List<Attribute> input) throws IllegalArgumentException, ParseException{
 		ArrayList<Formula> statements = new ArrayList<Formula>();
 		Iterator o = output.iterator();
 		while(o.hasNext()){
@@ -101,16 +102,41 @@ public class ExpressionMatcher {
 		//System.out.println(lCNFs[0]+" "+lCNFs[1]);
 		return DFs;
 	}
-	/*
-	public Map Mapping (Set source){
-		Map formatted = new HashMap();
-		Iterator i = source.iterator();
-		while(i.hasNext()){
-			Attribute attr = (Attribute) i.next();
-			String key = attr.key;
-			formatted.put(key, attr);
+	
+	public String ExpressionFormatter(List kvs, String expr){
+		Iterator i = kvs.iterator();
+		while (i.hasNext()){
+			Attribute attr = (Attribute)i.next();
+			String kv;
+			if (attr.operator.equals("ALL"))
+				kv= attr.key;
+			else
+				kv=attr.key+"'"+attr.operator+"'"+attr.value;
+			//System.out.println("kv "+ Pattern.quote(kv));
+			String atom = attr.id;
+			expr = expr.replaceAll(Pattern.quote(kv), atom); 
 		}
-		//System.out.println(formatted);
-		return formatted;
-	}*/
+		return expr;
+	}
+	
+	public List<Attribute> AtomExtractor (String expr, String flag){
+		List<Attribute> l = new ArrayList();
+		expr = expr.replaceAll("[()]", "");
+		String exprList[] = expr.split("[&|]");
+		for(int index = 0; index<exprList.length; ++index){
+			String kvp[] = exprList[index].split("'");
+			if (kvp.length == 3){
+				l.add(new Attribute(flag+l.size(),kvp[0],kvp[1],kvp[2]));
+			}
+			else if (kvp.length == 2){
+				l.add(new Attribute(flag+l.size(),kvp[0],kvp[1],""));
+			}
+			else if (kvp.length == 1){
+				l.add(new Attribute(flag+l.size(),kvp[0],"ALL",""));
+			}
+			
+		}
+		System.out.println(l.get(0).id+l.get(1).id+l.get(2).id);
+		return l;
+	}
 }
