@@ -32,7 +32,7 @@ public class ExpressionMatcher {
 			//System.out.println(lCNF+"->"+right);
 			//System.out.println(axioms[0]+" "+axioms[1]+" "+axioms[2]+" "+axioms[3]);
 			if(logic.inference().infer(axioms, lCNF.impl(right))){
-				res.put(lCNF, 0);
+				res.put(lCNF.toString(), 0);
 			}
 			else{
 				String[] DFs = CNFSplit(right);
@@ -42,13 +42,13 @@ public class ExpressionMatcher {
 					//System.out.println(DFs[j]);
 					Formula rDNF = (Formula)logic.createExpression(DFs[j]);
 					if(logic.inference().infer(axioms, lCNF.impl(rDNF))){
-						res.put(lCNF, 1);
+						res.put(lCNF.toString(), 1);
 						partial = true;
 						break;
 					}
 				}
 				if(partial == false)
-					res.put(lCNF, 2);
+					res.put(lCNF.toString(), 2);
 			}
 		}	
 		//System.out.println(fImpl);
@@ -103,7 +103,7 @@ public class ExpressionMatcher {
 		return DFs;
 	}
 	
-	public String ExpressionFormatter(List kvs, String expr){
+	public static String ExpressionFormatter(List kvs, String expr){
 		Iterator i = kvs.iterator();
 		while (i.hasNext()){
 			Attribute attr = (Attribute)i.next();
@@ -114,12 +114,12 @@ public class ExpressionMatcher {
 				kv=attr.key+"'"+attr.operator+"'"+attr.value;
 			//System.out.println("kv "+ Pattern.quote(kv));
 			String atom = attr.id;
-			expr = expr.replaceAll(Pattern.quote(kv), atom); 
+			expr = expr.replaceAll(Pattern.quote(kv), atom); //literally escapping
 		}
 		return expr;
 	}
 	
-	public List<Attribute> AtomExtractor (String expr, String flag){
+	public static List<Attribute> AtomExtractor (String expr, String flag){
 		List<Attribute> l = new ArrayList();
 		expr = expr.replaceAll("[()]", "");
 		String exprList[] = expr.split("[&|]");
@@ -136,7 +136,7 @@ public class ExpressionMatcher {
 			}
 			
 		}
-		System.out.println(l.get(0).id+l.get(1).id+l.get(2).id);
+		//System.out.println(l.get(0).id+l.get(1).id+l.get(2).id);
 		return l;
 	}
 }

@@ -1,11 +1,16 @@
 package matcher;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import orbital.logic.imp.Formula;
@@ -19,49 +24,76 @@ public class TriggerMatcher {
 	 * @param args
 	 * @throws ParseException 
 	 * @throws IllegalArgumentException 
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) throws IllegalArgumentException, ParseException {
+	public static void main(String[] args) throws IllegalArgumentException, ParseException, IOException {
+		int NUMBER = 5;
 		// TODO Auto-generated method stub
-//		List<Attribute> input = new ArrayList();
-//		List<Attribute> output = new ArrayList();
-//		
-//		String iExpr = "(key1~c*ar|key4~[ac]db)&(key3>ab)";
-//		String oExpr = "(key1=kind|key4>ab)&(key3~c*ar)";
-//		//String impl = "(oa|ob)->(ia&ib)";
-//		//String implNC = "(!a&!b)&(a&c)->false";
-//		//String implN = "ia&ic->!oa";
-//		//String implC = "(ob)&(ia&ic)->false";//T,_,_ definite; T,F,_ might; F,_,T unrelated; F,_,F partial
-//		input.add(new Attribute("ikv"+input.size(),"key1", "~","c*ar"));
-//		//input.add(new Attribute("a", "~","[kf]ind", 'i'));
-//		input.add(new Attribute("ikv"+input.size(),"key2", "=","2"));
-//		input.add(new Attribute("ikv"+input.size(),"key3", ">","ab"));
-//		input.add(new Attribute("ikv"+input.size(),"key4", "~","[ac]db"));
-//		
-//		output.add(new Attribute("okv"+output.size(),"key1", "=","kind"));
-//		output.add(new Attribute("okv"+output.size(),"key2", "~","c*ar"));
-//		output.add(new Attribute("okv"+output.size(),"key3", "~","c*ar"));
-//		output.add(new Attribute("okv"+output.size(),"key4", ">","ab"));
 		ExpressionMatcher em = new ExpressionMatcher();
-		String InputExpr = "((key1'='1|key2'='12)|key3'~'[ab]cd)";
-		String OutputExpr = "((key1'~'a*b&key2)|key3'>='a)";
-		List<Attribute> input = em.AtomExtractor(InputExpr, "ikv");
-		List<Attribute> output = em.AtomExtractor(OutputExpr, "okv");
-		Collections.sort(input, new AttrComparator());
-		Collections.sort(output, new AttrComparator());
+		GraphGenerator gg = new GraphGenerator();
+		Plotter plotter = new Plotter(gg.graph);
+		List<HandlerInfo> handlers = LoadHandlers(NUMBER);
+		gg.GenVertices(handlers);
+		for (int i = 0; i < handlers.size(); ++i){
+			for (int j = 0; j < handlers.size(); ++j){
+				System.out.println("From " + handlers.get(i).name + " To " + handlers.get(j).name);
+				Map result = MatchExpr(handlers.get(i), handlers.get(j), em);
+				System.out.println(handlers.get(i).outputExpr + " " + handlers.get(j).inputExpr);
+				System.out.println(result);
+				if (result.containsValue(0)||result.containsValue(1)){
+					gg.GenEdges(handlers.get(i), handlers.get(j), new TransitionInfo(handlers.get(i), handlers.get(j), result));
+				}
+				TriggerDisplay(result);
+			}
+		}
+		gg.ExportDot();
+		List cycles = gg.CycleDetection();
+		System.out.println(cycles);
+		plotter.VerticesToDOT();
+		plotter.EdgesToDOT();
+		plotter.ExportDot();
+	}
+	public static void TriggerDisplay(Map<String, Integer> triggers){
 		
-		String newiExpr = em.ExpressionFormatter(input, InputExpr);
-		String newoExpr = em.ExpressionFormatter(output, OutputExpr);
-		//System.out.println(newiExpr);
-		
-		Formula[] axioms = em.AxiomsGen(output, input);
-		System.out.println("implres "+em.Prove(axioms, newoExpr, newiExpr));
-		//axiomsSystem.out.println("implNC "+em.prove(output, input, implNC));
-		//System.out.println("implN "+em.prove(output, input, implN));
-		//System.out.println("implC "+em.prove(output, input, implC));
-		//System.out.println(em.prove(output, input, impl) ? "It is a Partial Trigger" : "It is a Complete Trigger");
-		
-		//System.out.println(input.get(0).id+input.get(1).key+input.get(1).operator+input.get(1).value+input.get(2).id);
+		Set<String> keyset = triggers.keySet();
+		Iterator<String> i = keyset.iterator();
+		while (i.hasNext()){
+			String subExpr = i.next();
+			switch(triggers.get(subExpr)){
+			case 0: System.out.println(subExpr + " is a complete trigger");break;
+			case 1: System.out.println(subExpr + " is a partial trigger");break;
+			case 2: System.out.println(subExpr + " is not a trigger");break;
+			default: break;
+			}
+		}
+	}
+	public static Map MatchExpr(HandlerInfo handlerFrom, HandlerInfo handlerTo, ExpressionMatcher em){
+		try {
+			Formula[] axioms = em.AxiomsGen(handlerFrom.outputAtoms, handlerTo.inputAtoms);
+			return em.Prove(axioms, handlerFrom.newoExpr, handlerTo.newiExpr);
+		} catch (IllegalArgumentException | ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}//This is to extract 
 		
 	}
-	
+	public static List<HandlerInfo> LoadHandlers(int num) throws IOException{
+		BufferedReader br;
+		String name;
+		String inputExpr;
+		String outputExpr;
+		List<HandlerInfo> handlers = new ArrayList();
+		for (int i = 1; i <= num; ++i){
+			br = new BufferedReader(new FileReader("test/"+i+".txt"));
+			//System.out.println("OK till here" + num);
+			name = br.readLine();
+			inputExpr = br.readLine();
+			outputExpr = br.readLine();
+			//System.out.println("OK till here");
+			br.close();
+			handlers.add(new HandlerInfo(name, inputExpr, outputExpr));
+		}
+		return handlers;
+	}
 }
