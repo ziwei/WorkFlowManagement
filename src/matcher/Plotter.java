@@ -1,6 +1,7 @@
 package matcher;
 
 import java.io.File;
+import java.util.regex.Pattern;
 
 import org.jgrapht.Graph;
 
@@ -21,10 +22,10 @@ public class Plotter {
 	 public void VerticesToDOT(){
 		 for (HandlerInfo hi : graph.vertexSet()){
 			 if (hi.acyclic == true){
-				 gv.add(hi.name+"[label=\"<Handler>"+hi.name+"|{<Input>"+Escape(hi.newiExpr)+"|<Output>"+Escape(hi.newoExpr)+"}\"]");
+				 gv.add(hi.name+"[label=\"<Handler>"+hi.name+"|{<Input>"+Escape(hi.inputExpr)+"|<Output>"+Escape(hi.outputExpr)+"}\"]");
 			 }
 			 else {
-				 gv.add(hi.name+"[color=red label=\"<Handler>"+hi.name+"|{<Input>"+Escape(hi.newiExpr)+"|<Output>"+Escape(hi.newoExpr)+"}\"]");
+				 gv.add(hi.name+"[color=red label=\"<Handler>"+hi.name+"|{<Input>"+Escape(hi.inputExpr)+"|<Output>"+Escape(hi.outputExpr)+"}\"]");
 			 }
 		 }
 	 }
@@ -33,21 +34,26 @@ public class Plotter {
 		 for (TransitionInfo ti : graph.edgeSet()){
 			 if (ti.acyclic == true){
 				 if (ti.complete.size() > 0)
-					 gv.add(ti.from.name+":Output->"+ti.to.name+":Input");
+					 gv.add(ti.from.name+":Output->"+ti.to.name+
+							 ":Input[label=\"c:"+ti.complete.size()+" p:"+ti.partial.size()+"\"]");
 				 else
-					 gv.add(ti.from.name+":Output->"+ti.to.name+":Input[style=dotted]");
+					 gv.add(ti.from.name+":Output->"+ti.to.name+
+							 ":Input[style=dotted label=\"c:"+ti.complete.size()+" p:"+ti.partial.size()+"\"]");
 			 }
 			 else {
 				 if (ti.complete.size() > 0)
-					 gv.add(ti.from.name+":Output->"+ti.to.name+":Input[color=red]");
+					 gv.add(ti.from.name+":Output->"+ti.to.name+
+							 ":Input[color=red label=\"c:"+ti.complete.size()+" p:"+ti.partial.size()+"\"]");
 				 else
-					 gv.add(ti.from.name+":Output->"+ti.to.name+":Input[color=red style=dotted]");
+					 gv.add(ti.from.name+":Output->"+ti.to.name+
+							 ":Input[color=red style=dotted label=\"c:"+ti.complete.size()+" p:"+ti.partial.size()+"\"]");
 			 }
 		 }
 	 }
 	 private String Escape(String expr){
-		 //String newstr = expr.replaceAll("\\|", "\\\\|");
-		 return expr.replaceAll("\\|", "\\\\|");
+		 String newstr = expr.replaceAll("\\|", "\\\\|").replaceAll("\\<", "\\\\<")
+				 .replaceAll("\\>", "\\\\>").replaceAll("\\{", "\\\\{").replaceAll("\\}", "\\\\}");
+		 return newstr;
 	 }
 	 public void ExportDot(){
 		 String type = "png";

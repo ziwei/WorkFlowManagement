@@ -27,12 +27,12 @@ public class TriggerMatcher {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IllegalArgumentException, ParseException, IOException {
-		int NUMBER = 5;
+		//int NUMBER = 5;
 		// TODO Auto-generated method stub
 		ExpressionMatcher em = new ExpressionMatcher();
 		GraphGenerator gg = new GraphGenerator();
 		Plotter plotter = new Plotter(gg.graph);
-		List<HandlerInfo> handlers = LoadHandlers(NUMBER);
+		List<HandlerInfo> handlers = LoadHandlers();
 		gg.GenVertices(handlers);
 		for (int i = 0; i < handlers.size(); ++i){
 			for (int j = 0; j < handlers.size(); ++j){
@@ -78,22 +78,25 @@ public class TriggerMatcher {
 		}//This is to extract 
 		
 	}
-	public static List<HandlerInfo> LoadHandlers(int num) throws IOException{
+	public static List<HandlerInfo> LoadHandlers() throws IOException{
 		BufferedReader br;
 		String name;
 		String inputExpr;
 		String outputExpr;
 		List<HandlerInfo> handlers = new ArrayList();
-		for (int i = 1; i <= num; ++i){
-			br = new BufferedReader(new FileReader("test/"+i+".txt"));
+		//for (int i = 1; i <= num; ++i){
+			br = new BufferedReader(new FileReader("test/1.txt"));
 			//System.out.println("OK till here" + num);
-			name = br.readLine();
-			inputExpr = br.readLine();
-			outputExpr = br.readLine();
+			while ((name = br.readLine()) != null){
+				inputExpr = br.readLine();
+				outputExpr = br.readLine();
+				handlers.add(new HandlerInfo(name, inputExpr, outputExpr));
+				br.readLine();
+			}
 			//System.out.println("OK till here");
 			br.close();
-			handlers.add(new HandlerInfo(name, inputExpr, outputExpr));
-		}
+		
+		//}
 		return handlers;
 	}
 }
