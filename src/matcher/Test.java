@@ -25,7 +25,7 @@ public class Test {
 		GraphGenerator gg = new GraphGenerator();
 		gg.GenVertices(handlers);
 		gg.GenEdges(handlers.get(0), handlers.get(1), new TransitionInfo(handlers.get(0), handlers.get(1), new HashMap()));
-		gg.ExportDot();
+		//gg.ExportDot();
 	}
 	public static List<HandlerInfo> LoadHandlers(int num) throws IOException{
 		BufferedReader br;

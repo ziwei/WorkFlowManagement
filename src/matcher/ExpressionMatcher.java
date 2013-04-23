@@ -17,18 +17,19 @@ import orbital.moon.logic.ClassicalLogic;
 public class ExpressionMatcher {
 	Logic logic;
 	
+	
 	public ExpressionMatcher(){
 		logic = new ClassicalLogic();
 	}
 	
 	public Map Prove(Formula[] axioms, String l, String r) throws IllegalArgumentException, ParseException{
 		Map res = new HashMap();
-		System.out.println(l+" "+r);
+		//System.out.println(l+" "+r);
 		String[] CFs = DNFSplit((Formula)logic.createExpression(l));
 		Formula right = (Formula)logic.createExpression(r);
 		//Formula fal = (Formula)logic.createExpression("false");
-		for(int i=0; i<CFs.length; ++i){
-			Formula lCNF = (Formula)logic.createExpression(CFs[i]);
+		for(String CF : CFs){
+			Formula lCNF = (Formula)logic.createExpression(CF);
 			//System.out.println(lCNF+"->"+right);
 			//System.out.println(axioms[0]+" "+axioms[1]+" "+axioms[2]+" "+axioms[3]);
 			if(logic.inference().infer(axioms, lCNF.impl(right))){
@@ -38,9 +39,9 @@ public class ExpressionMatcher {
 				String[] DFs = CNFSplit(right);
 				//System.out.println(DFs[0]+" "+DFs[1]);
 				boolean partial = false;
-				for(int j=0; j<DFs.length; ++j){
+				for(String DF : DFs){
 					//System.out.println(DFs[j]);
-					Formula rDNF = (Formula)logic.createExpression(DFs[j]);
+					Formula rDNF = (Formula)logic.createExpression(DF);
 					if(logic.inference().infer(axioms, lCNF.impl(rDNF))){
 						res.put(lCNF.toString(), 1);
 						partial = true;
@@ -62,18 +63,24 @@ public class ExpressionMatcher {
 			//String diffKeyState = "";
 			Attribute oAttr = (Attribute) o.next();
 			Iterator i = input.iterator();
-			while(i.hasNext()){
-				Attribute iAttr = (Attribute)i.next();
-				if (oAttr.key.equals(iAttr.key)){
-					//System.out.println("OK till here");
-					String sameKeyState = ValueMatcher.ValueMatch(oAttr, iAttr);
-					//System.out.println("OK till here4");
-					if (null != sameKeyState){
-						Formula fState  = (Formula)logic.createExpression(sameKeyState);
-						statements.add(fState);
+//			if (oAttr.value.startsWith("'")){
+//				String key1 = oAttr.key;
+//				String key2 = oAttr.value.substring(1, oAttr.value.length());
+//			}
+			//else{
+				while(i.hasNext()){
+					Attribute iAttr = (Attribute)i.next();
+					if (oAttr.getKey().equals(iAttr.getKey())){
+						//System.out.println("OK till here");
+						String sameKeyState = ValueMatcher.ValueMatch(oAttr, iAttr);
+						//System.out.println("OK till here4");
+						if (null != sameKeyState){
+							Formula fState  = (Formula)logic.createExpression(sameKeyState);
+							statements.add(fState);
+						}
 					}
 				}
-			}
+			//}
 			//diffKeyState = "" + diffKeyState.substring(1) + "->!(" + oAttr.id + ")";
 		}
 		return statements.toArray(new Formula[statements.size()]);
@@ -90,6 +97,10 @@ public class ExpressionMatcher {
 			//comp = left.impl(right);
 		//System.out.println(lCNFs[0]+" "+lCNFs[1]);
 		return CFs;
+	}
+	public String DNFTransfer(String formula) throws IllegalArgumentException, ParseException{
+		Formula dnf = ClassicalLogic.Utilities.disjunctiveForm((Formula)logic.createExpression(formula), true);
+		return dnf.toString();
 	}
 	
 	private String[] CNFSplit(Formula f){
@@ -108,18 +119,18 @@ public class ExpressionMatcher {
 		while (i.hasNext()){
 			Attribute attr = (Attribute)i.next();
 			String kv;
-			if (attr.operator.equals("ALL"))
-				kv= attr.key;
+			if (attr.getOperator().equals("ALL"))
+				kv= attr.getKey();
 			else
-				kv=attr.key+"'"+attr.operator+"'"+attr.value;
+				kv=attr.getKey()+"'"+attr.getOperator()+"'"+attr.getValue();
 			//System.out.println("kv "+ Pattern.quote(kv));
-			String atom = attr.id;
+			String atom = attr.getId();
 			expr = expr.replaceAll(Pattern.quote(kv), atom); //literally escapping
 		}
 		return expr;
 	}
 	
-	public static List<Attribute> AtomExtractor (String expr, String flag){
+	public static List<Attribute> AtomExtractor (String expr, String flag, Map atoms){
 		List<Attribute> l = new ArrayList();
 		expr = expr.replaceAll("[()]", "");
 		String exprList[] = expr.split("[&|]");
@@ -134,8 +145,9 @@ public class ExpressionMatcher {
 			else if (kvp.length == 1){
 				l.add(new Attribute(flag+l.size(),kvp[0],"ALL",""));
 			}
-			
+			atoms.put(flag+l.size(), exprList[index]);
 		}
+		
 		//System.out.println(l.get(0).id+l.get(1).id+l.get(2).id);
 		return l;
 	}

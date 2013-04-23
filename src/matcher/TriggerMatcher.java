@@ -34,25 +34,29 @@ public class TriggerMatcher {
 		Plotter plotter = new Plotter(gg.graph);
 		List<HandlerInfo> handlers = LoadHandlers();
 		gg.GenVertices(handlers);
-		for (int i = 0; i < handlers.size(); ++i){
-			for (int j = 0; j < handlers.size(); ++j){
-				System.out.println("From " + handlers.get(i).name + " To " + handlers.get(j).name);
-				Map result = MatchExpr(handlers.get(i), handlers.get(j), em);
-				System.out.println(handlers.get(i).outputExpr + " " + handlers.get(j).inputExpr);
-				System.out.println(result);
+		for (HandlerInfo from : handlers){
+			for (HandlerInfo to : handlers){
+				System.out.println("From " + from.getName() + " To " + to.getName());
+				Map result = MatchExpr(from, to, em);
+				System.out.println("Original Output: " + from.getOutputExpr());
+				System.out.println("Dictionary: " + from.getAtoms());
+				System.out.println("Disjunctive Output: " + em.DNFTransfer(from.getNewoExpr()));
+				//System.out.println(result);
 				if (result.containsValue(0)||result.containsValue(1)){
-					gg.GenEdges(handlers.get(i), handlers.get(j), new TransitionInfo(handlers.get(i), handlers.get(j), result));
+					gg.GenEdges(from, to, new TransitionInfo(from, to, result));
 				}
 				TriggerDisplay(result);
+				System.out.println();
 			}
 		}
-		gg.ExportDot();
+		//gg.ExportDot();
 		List cycles = gg.CycleDetection();
-		System.out.println(cycles);
+		//System.out.println(cycles);
 		plotter.VerticesToDOT();
 		plotter.EdgesToDOT();
 		plotter.ExportDot();
 	}
+	
 	public static void TriggerDisplay(Map<String, Integer> triggers){
 		
 		Set<String> keyset = triggers.keySet();
@@ -69,8 +73,8 @@ public class TriggerMatcher {
 	}
 	public static Map MatchExpr(HandlerInfo handlerFrom, HandlerInfo handlerTo, ExpressionMatcher em){
 		try {
-			Formula[] axioms = em.AxiomsGen(handlerFrom.outputAtoms, handlerTo.inputAtoms);
-			return em.Prove(axioms, handlerFrom.newoExpr, handlerTo.newiExpr);
+			Formula[] axioms = em.AxiomsGen(handlerFrom.getOutputAtoms(), handlerTo.getInputAtoms());
+			return em.Prove(axioms, handlerFrom.getNewoExpr(), handlerTo.getNewiExpr());
 		} catch (IllegalArgumentException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -13,170 +13,170 @@ import dk.brics.automaton.Transition;
 public class ValueMatcher {
 	public static final int LIMIT = 25;
 	public static String ValueMatch(Attribute output, Attribute input){
-		String implies = output.id+"->("+input.id+")";
-		String notImplies = input.id+"->~("+output.id+")";
-		if (output.operator.equals("=")){
-			if (input.operator.equals("=")){
-				return output.value.equals(input.value) ? implies : notImplies;
+		String implies = output.getId()+"->("+input.getId()+")";
+		String notImplies = input.getId()+"->~("+output.getId()+")";
+		if (output.getOperator().equals("=")){
+			if (input.getOperator().equals("=")){
+				return output.getValue().equals(input.getValue()) ? implies : notImplies;
 			}
-			else if (input.operator.equals(">")){
-				return output.value.compareTo(input.value)>0 ? implies : notImplies;
+			else if (input.getOperator().equals(">")){
+				return output.getValue().compareTo(input.getValue())>0 ? implies : notImplies;
 			}
-			else if (input.operator.equals(">=")){
-				return output.value.compareTo(input.value)>-1 ? implies : notImplies;
+			else if (input.getOperator().equals(">=")){
+				return output.getValue().compareTo(input.getValue())>-1 ? implies : notImplies;
 			}
-			else if (input.operator.equals("<")){
-				return output.value.compareTo(input.value)<0 ? implies : notImplies;
+			else if (input.getOperator().equals("<")){
+				return output.getValue().compareTo(input.getValue())<0 ? implies : notImplies;
 			}
-			else if (input.operator.equals("<")){
-				return output.value.compareTo(input.value)<1 ? implies : notImplies;
+			else if (input.getOperator().equals("<")){
+				return output.getValue().compareTo(input.getValue())<1 ? implies : notImplies;
 			}
-			else if (input.operator.equals("~")){
+			else if (input.getOperator().equals("~")){
 				Automaton intersec = BasicOperations.intersection(ToAutomaton(output), ToAutomaton(input));
 				return (intersec.getNumberOfTransitions()>0) ? implies : notImplies;
 			}
-			else if (input.operator.equals("ALL")){
+			else if (input.getOperator().equals("ALL")){
 				return implies;
 			}
 		}
-		else if (output.operator.equals("~")){
+		else if (output.getOperator().equals("~")){
 			//System.out.println("OK till here2");
 			Automaton o = ToAutomaton(output);
 			String maxStr = MaxString(o, LIMIT);
 			String minStr = MinString(o, LIMIT);
 			//System.out.println("OK till here3");
-			if (input.operator.equals("=")){
+			if (input.getOperator().equals("=")){
 				Automaton intersec = BasicOperations.intersection(o, ToAutomaton(input));
 				return (intersec.getNumberOfTransitions()>0) ? implies : notImplies;
 			}
-			else if (input.operator.equals(">")){
+			else if (input.getOperator().equals(">")){
 				//System.out.println("OK till here "+maxStr.compareTo(input.value));
-				return maxStr.compareTo(input.value)>0 ? implies : notImplies;
+				return maxStr.compareTo(input.getValue())>0 ? implies : notImplies;
 			}
-			else if (input.operator.equals(">=")){
-				return maxStr.compareTo(input.value)>-1 ? implies : notImplies;
+			else if (input.getOperator().equals(">=")){
+				return maxStr.compareTo(input.getValue())>-1 ? implies : notImplies;
 			}
-			else if (input.operator.equals("<")){
-				return minStr.compareTo(input.value)<0 ? implies : notImplies;
+			else if (input.getOperator().equals("<")){
+				return minStr.compareTo(input.getValue())<0 ? implies : notImplies;
 			}
-			else if (input.operator.equals("<")){
-				return minStr.compareTo(input.value)<1 ? implies : notImplies;
+			else if (input.getOperator().equals("<")){
+				return minStr.compareTo(input.getValue())<1 ? implies : notImplies;
 			}
-			else if (input.operator.equals("~")){
+			else if (input.getOperator().equals("~")){
 				Automaton intersec = BasicOperations.intersection(ToAutomaton(output), ToAutomaton(input));
 				return (intersec.getNumberOfTransitions()>0) ? implies : notImplies;
 			}
-			else if (input.operator.equals("ALL")){
+			else if (input.getOperator().equals("ALL")){
 				return implies;
 			}
 		}
-		else if (output.operator.equals("<")){
-			if (input.operator.equals("=")){
-				return output.value.compareTo(input.value)>0 ? implies : notImplies;
+		else if (output.getOperator().equals("<")){
+			if (input.getOperator().equals("=")){
+				return output.getValue().compareTo(input.getValue())>0 ? implies : notImplies;
 			}
-			else if (input.operator.equals(">")){
-				return output.value.compareTo(input.value)>0 ? implies : notImplies;
+			else if (input.getOperator().equals(">")){
+				return output.getValue().compareTo(input.getValue())>0 ? implies : notImplies;
 			}
-			else if (input.operator.equals(">=")){
-				return output.value.compareTo(input.value)>0 ? implies : notImplies;
+			else if (input.getOperator().equals(">=")){
+				return output.getValue().compareTo(input.getValue())>0 ? implies : notImplies;
 			}
-			else if (input.operator.equals("<")){
+			else if (input.getOperator().equals("<")){
 				return implies;
 			}
-			else if (input.operator.equals("<=")){
+			else if (input.getOperator().equals("<=")){
 				return implies;
 			}
-			else if (input.operator.equals("~")){
+			else if (input.getOperator().equals("~")){
 				Automaton i = ToAutomaton(input);
 				String minStr = MinString(i, LIMIT);
-				return output.value.compareTo(minStr)>0 ? implies : notImplies;
+				return output.getValue().compareTo(minStr)>0 ? implies : notImplies;
 			}
-			else if (input.operator.equals("ALL")){
+			else if (input.getOperator().equals("ALL")){
 				return implies;
 			}
 		}
-		else if (output.operator.equals("<=")){
-			if (input.operator.equals("=")){
-				return output.value.compareTo(input.value)>-1 ? implies : notImplies;
+		else if (output.getOperator().equals("<=")){
+			if (input.getOperator().equals("=")){
+				return output.getValue().compareTo(input.getValue())>-1 ? implies : notImplies;
 			}
-			else if (input.operator.equals(">")){
-				return output.value.compareTo(input.value)>0 ? implies : notImplies;
+			else if (input.getOperator().equals(">")){
+				return output.getValue().compareTo(input.getValue())>0 ? implies : notImplies;
 			}
-			else if (input.operator.equals(">=")){
-				return output.value.compareTo(input.value)>-1 ? implies : notImplies;
+			else if (input.getOperator().equals(">=")){
+				return output.getValue().compareTo(input.getValue())>-1 ? implies : notImplies;
 			}
-			else if (input.operator.equals("<")){
+			else if (input.getOperator().equals("<")){
 				return implies;
 			}
-			else if (input.operator.equals("<=")){
+			else if (input.getOperator().equals("<=")){
 				return implies;
 			}
-			else if (input.operator.equals("~")){
+			else if (input.getOperator().equals("~")){
 				Automaton i = ToAutomaton(input);
 				String minStr = MinString(i, LIMIT);
-				return output.value.compareTo(minStr)>-1 ? implies : notImplies;
+				return output.getValue().compareTo(minStr)>-1 ? implies : notImplies;
 			}
-			else if (input.operator.equals("ALL")){
+			else if (input.getOperator().equals("ALL")){
 				return implies;
 			}
 		}
-		else if (output.operator.equals(">")){
-			if (input.operator.equals("=")){
-				return output.value.compareTo(input.value)<0 ? implies : notImplies;
+		else if (output.getOperator().equals(">")){
+			if (input.getOperator().equals("=")){
+				return output.getValue().compareTo(input.getValue())<0 ? implies : notImplies;
 			}
-			else if (input.operator.equals(">")){
+			else if (input.getOperator().equals(">")){
 				return implies;
 			}
-			else if (input.operator.equals(">=")){
+			else if (input.getOperator().equals(">=")){
 				return implies;
 			}
-			else if (input.operator.equals("<")){
-				return output.value.compareTo(input.value)<0 ? implies : notImplies;
+			else if (input.getOperator().equals("<")){
+				return output.getValue().compareTo(input.getValue())<0 ? implies : notImplies;
 			}
-			else if (input.operator.equals("<=")){
-				return output.value.compareTo(input.value)<0 ? implies : notImplies;
+			else if (input.getOperator().equals("<=")){
+				return output.getValue().compareTo(input.getValue())<0 ? implies : notImplies;
 			}
-			else if (input.operator.equals("~")){
+			else if (input.getOperator().equals("~")){
 				Automaton i = ToAutomaton(input);
 				String maxStr = MaxString(i, LIMIT);
-				return output.value.compareTo(maxStr)<0 ? implies : notImplies;
+				return output.getValue().compareTo(maxStr)<0 ? implies : notImplies;
 			}
-			else if (input.operator.equals("ALL")){
+			else if (input.getOperator().equals("ALL")){
 				return implies;
 			}
 		}
-		else if (output.operator.equals(">=")){
-			if (input.operator.equals("=")){
-				return output.value.compareTo(input.value)>-1 ? implies : notImplies;
+		else if (output.getOperator().equals(">=")){
+			if (input.getOperator().equals("=")){
+				return output.getValue().compareTo(input.getValue())>-1 ? implies : notImplies;
 			}
-			else if (input.operator.equals(">")){
+			else if (input.getOperator().equals(">")){
 				return implies;
 			}
-			else if (input.operator.equals(">=")){
+			else if (input.getOperator().equals(">=")){
 				return implies;
 			}
-			else if (input.operator.equals("<")){
-				return output.value.compareTo(input.value)<0 ? implies : notImplies;
+			else if (input.getOperator().equals("<")){
+				return output.getValue().compareTo(input.getValue())<0 ? implies : notImplies;
 			}
-			else if (input.operator.equals("<=")){
-				return output.value.compareTo(input.value)<1 ? implies : notImplies;
+			else if (input.getOperator().equals("<=")){
+				return output.getValue().compareTo(input.getValue())<1 ? implies : notImplies;
 			}
-			else if (input.operator.equals("~")){
+			else if (input.getOperator().equals("~")){
 				Automaton i = ToAutomaton(input);
 				String maxStr = MaxString(i, LIMIT);
-				return output.value.compareTo(maxStr)<1 ? implies : notImplies;
+				return output.getValue().compareTo(maxStr)<1 ? implies : notImplies;
 			}
-			else if (input.operator.equals("ALL")){
+			else if (input.getOperator().equals("ALL")){
 				return implies;
 			}
 		}
-		else if (output.operator.equals("ALL")) return implies;
+		else if (output.getOperator().equals("ALL")) return implies;
 		
 		return null;
 	}
 	
 	private static Automaton ToAutomaton(Attribute attr){
-		RegExp regex = new RegExp(attr.value);
+		RegExp regex = new RegExp(attr.getValue());
 		return regex.toAutomaton();
 	}
 	
@@ -186,8 +186,7 @@ public class ValueMatcher {
 		while (!state.isAccept()){
 			List<Transition> lTrans = state.getSortedTransitions(true);
 			char maxChar='\u0000';
-			for (int i = 0; i < lTrans.size(); ++i){
-				Transition t = lTrans.get(i);
+			for (Transition t : lTrans){
 				if (maxChar <= t.getMax()){
 					maxChar = t.getMax();
 					state = t.getDest();
@@ -205,8 +204,7 @@ public class ValueMatcher {
 		while (!state.isAccept()){
 			List<Transition> lTrans = state.getSortedTransitions(true);
 			char minChar='\uffff';
-			for (int i = 0; i < lTrans.size(); ++i){
-				Transition t = lTrans.get(i);
+			for (Transition t : lTrans){
 				if (minChar <= t.getMin()){
 					minChar = t.getMin();
 					state = t.getDest();

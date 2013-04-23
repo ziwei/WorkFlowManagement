@@ -21,32 +21,32 @@ public class Plotter {
 	   }
 	 public void VerticesToDOT(){
 		 for (HandlerInfo hi : graph.vertexSet()){
-			 if (hi.acyclic == true){
-				 gv.add(hi.name+"[label=\"<Handler>"+hi.name+"|{<Input>"+Escape(hi.inputExpr)+"|<Output>"+Escape(hi.outputExpr)+"}\"]");
+			 if (hi.isAcyclic() == true){
+				 gv.add(hi.getName()+"[label=\"<Handler>"+hi.getName()+"|{<Input>"+Escape(hi.getInputExpr())+"|<Output>"+Escape(hi.getOutputExpr())+"}\"]");
 			 }
 			 else {
-				 gv.add(hi.name+"[color=red label=\"<Handler>"+hi.name+"|{<Input>"+Escape(hi.inputExpr)+"|<Output>"+Escape(hi.outputExpr)+"}\"]");
+				 gv.add(hi.getName()+"[color=red label=\"<Handler>"+hi.getName()+"|{<Input>"+Escape(hi.getInputExpr())+"|<Output>"+Escape(hi.getOutputExpr())+"}\"]");
 			 }
 		 }
 	 }
 	 
 	 public void EdgesToDOT(){
 		 for (TransitionInfo ti : graph.edgeSet()){
-			 if (ti.acyclic == true){
-				 if (ti.complete.size() > 0)
-					 gv.add(ti.from.name+":Output->"+ti.to.name+
-							 ":Input[label=\"c:"+ti.complete.size()+" p:"+ti.partial.size()+"\"]");
+			 if (ti.isAcyclic() == true){
+				 if (ti.getComplete().size() > 0)
+					 gv.add(ti.getFrom().getName()+":Output->"+ti.getTo().getName()+
+							 ":Input[label=\"c:"+ti.getComplete().size()+" p:"+ti.getPartial().size()+"\"]");
 				 else
-					 gv.add(ti.from.name+":Output->"+ti.to.name+
-							 ":Input[style=dotted label=\"c:"+ti.complete.size()+" p:"+ti.partial.size()+"\"]");
+					 gv.add(ti.getFrom().getName()+":Output->"+ti.getTo().getName()+
+							 ":Input[style=dotted label=\"c:"+ti.getComplete().size()+" p:"+ti.getPartial().size()+"\"]");
 			 }
 			 else {
-				 if (ti.complete.size() > 0)
-					 gv.add(ti.from.name+":Output->"+ti.to.name+
-							 ":Input[color=red label=\"c:"+ti.complete.size()+" p:"+ti.partial.size()+"\"]");
+				 if (ti.getComplete().size() > 0)
+					 gv.add(ti.getFrom().getName()+":Output->"+ti.getTo().getName()+
+							 ":Input[color=red label=\"c:"+ti.getComplete().size()+" p:"+ti.getPartial().size()+"\"]");
 				 else
-					 gv.add(ti.from.name+":Output->"+ti.to.name+
-							 ":Input[color=red style=dotted label=\"c:"+ti.complete.size()+" p:"+ti.partial.size()+"\"]");
+					 gv.add(ti.getFrom().getName()+":Output->"+ti.getTo().getName()+
+							 ":Input[color=red style=dotted label=\"c:"+ti.getComplete().size()+" p:"+ti.getPartial().size()+"\"]");
 			 }
 		 }
 	 }
@@ -60,17 +60,4 @@ public class Plotter {
 		 File out = new File("plot." + type);
 		 gv.writeGraphToFile( gv.getGraph( gv.getDotSource(), type ), out );
 	 }
-	   		
-//	      String type = "gif";
-//	    String type = "dot";
-//	    String type = "fig";    // open with xfig
-//	    String type = "pdf";
-//		    String type = "ps";
-//	    String type = "svg";    // open with inkscape
-	   // String type = "png";
-//	      String type = "plain";
-		 //  File out = new File("auto." + type);   // Linux
-//		   File out = new File("c:/eclipse.ws/graphviz-java-api/tmp/simple." + type);   // Windows
-		//   gv.writeGraphToFile( gv.getGraph( gv.getDotSource(), type ), out );
-	  // }
 }

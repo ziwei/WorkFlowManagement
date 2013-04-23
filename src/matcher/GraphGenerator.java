@@ -27,8 +27,7 @@ public class GraphGenerator {
 	}
 	public void GenVertices(List<HandlerInfo> handlers){
 		//DirectedGraph<String, DefaultEdge> g = new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
-		for (int i = 0; i < handlers.size(); ++i){
-			HandlerInfo hi = handlers.get(i);
+		for (HandlerInfo hi: handlers){
 			graph.addVertex(hi);
 			//System.out.println(handlers.get(i).name);
 		}
@@ -36,26 +35,26 @@ public class GraphGenerator {
 	public void GenEdges(HandlerInfo s, HandlerInfo t, TransitionInfo ti){
 		graph.addEdge(s, t, ti);
 	}
-	public void ExportDot() throws IOException{
-		Writer w = new FileWriter("text.dot");
-		VertexNameProvider labelProvider = new StringNameProvider<String>();
-		VertexNameProvider idProvider = new IntegerNameProvider<String>();
-		StringEdgeNameProvider<String> enp = new StringEdgeNameProvider();
-		DOTExporter d = new DOTExporter(idProvider, labelProvider, enp);
-		d.export(w, graph);
-	}
+//	public void ExportDot() throws IOException{
+//		Writer w = new FileWriter("text.dot");
+//		VertexNameProvider labelProvider = new StringNameProvider<String>();
+//		VertexNameProvider idProvider = new IntegerNameProvider<String>();
+//		StringEdgeNameProvider<String> enp = new StringEdgeNameProvider();
+//		DOTExporter d = new DOTExporter(idProvider, labelProvider, enp);
+//		d.export(w, graph);
+//	}
 	public List CycleDetection(){
 		StrongConnectivityInspector sci = new StrongConnectivityInspector(graph);
 		List<DirectedSubgraph> subgs = sci.stronglyConnectedSubgraphs();
 		for (DirectedSubgraph<HandlerInfo, TransitionInfo> ds : subgs){ /// reference modified?
 			if (ds.edgeSet().size() > 0){
 				for (TransitionInfo ti : ds.edgeSet()){
-					System.out.println(ti.from.name+"->"+ti.to.name);
-					ti.acyclic = false;
+					//System.out.println(ti.from.name+"->"+ti.to.name);
+					ti.setAcyclic(false);
 				}
 				for (HandlerInfo hi : ds.vertexSet()){
-					System.out.println(hi.name);
-					hi.acyclic = false;
+					//System.out.println(hi.name);
+					hi.setAcyclic(false);
 				}
 			}
 		}
