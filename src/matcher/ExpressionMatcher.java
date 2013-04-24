@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.*;
 
+import obj.Attribute;
+
 import orbital.logic.functor.Predicates;
 import orbital.logic.imp.Formula;
 import orbital.logic.imp.Logic;
@@ -114,41 +116,6 @@ public class ExpressionMatcher {
 		return DFs;
 	}
 	
-	public static String ExpressionFormatter(List kvs, String expr){
-		Iterator i = kvs.iterator();
-		while (i.hasNext()){
-			Attribute attr = (Attribute)i.next();
-			String kv;
-			if (attr.getOperator().equals("ALL"))
-				kv= attr.getKey();
-			else
-				kv=attr.getKey()+"'"+attr.getOperator()+"'"+attr.getValue();
-			//System.out.println("kv "+ Pattern.quote(kv));
-			String atom = attr.getId();
-			expr = expr.replaceAll(Pattern.quote(kv), atom); //literally escapping
-		}
-		return expr;
-	}
 	
-	public static List<Attribute> AtomExtractor (String expr, String flag, Map atoms){
-		List<Attribute> l = new ArrayList();
-		expr = expr.replaceAll("[()]", "");
-		String exprList[] = expr.split("[&|]");
-		for(int index = 0; index<exprList.length; ++index){
-			String kvp[] = exprList[index].split("'");
-			if (kvp.length == 3){
-				l.add(new Attribute(flag+l.size(),kvp[0],kvp[1],kvp[2]));
-			}
-			else if (kvp.length == 2){
-				l.add(new Attribute(flag+l.size(),kvp[0],kvp[1],""));
-			}
-			else if (kvp.length == 1){
-				l.add(new Attribute(flag+l.size(),kvp[0],"ALL",""));
-			}
-			atoms.put(flag+l.size(), exprList[index]);
-		}
-		
-		//System.out.println(l.get(0).id+l.get(1).id+l.get(2).id);
-		return l;
-	}
+	
 }

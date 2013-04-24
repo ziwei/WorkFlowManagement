@@ -13,10 +13,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import obj.HandlerInfo;
+import obj.TransitionInfo;
 import orbital.logic.imp.Formula;
 import orbital.logic.sign.ParseException;
 
 import java.util.regex.*;
+
+import org.jgrapht.GraphPath;
+
+import plotter.Plotter;
 
 public class TriggerMatcher {
 
@@ -55,6 +61,13 @@ public class TriggerMatcher {
 		plotter.VerticesToDOT();
 		plotter.EdgesToDOT();
 		plotter.ExportDot();
+		
+		List<GraphPath> lPaths = gg.getPaths(handlers.get(0), handlers.get(4));
+		for (GraphPath<HandlerInfo, TransitionInfo> gpl : lPaths){
+			for (TransitionInfo ti : gpl.getEdgeList())
+				System.out.print(ti.getFrom().getName()+"->"+ti.getTo().getName()+" ");
+			System.out.println();
+		}
 	}
 	
 	public static void TriggerDisplay(Map<String, Integer> triggers){

@@ -6,9 +6,13 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Set;
 
+import obj.HandlerInfo;
+import obj.TransitionInfo;
+
 import org.jgraph.graph.*;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.EdgeNameProvider;
 import org.jgrapht.ext.IntegerNameProvider;
@@ -17,7 +21,9 @@ import org.jgrapht.ext.StringNameProvider;
 import org.jgrapht.ext.VertexNameProvider;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DirectedSubgraph;
+import org.jgrapht.graph.GraphPathImpl;
 import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.alg.KShortestPaths;
 import org.jgrapht.alg.StrongConnectivityInspector;
 
 public class GraphGenerator {
@@ -60,5 +66,9 @@ public class GraphGenerator {
 		}
 		//CycleDetector cd = new CycleDetector(graph);
 		return subgs;
+	}
+	public List<GraphPath> getPaths(HandlerInfo start, HandlerInfo end){
+		KShortestPaths ksp = new KShortestPaths(graph, start, 8);
+		return ksp.getPaths(end);
 	}
 }

@@ -2,6 +2,8 @@ package matcher;
 
 import java.util.List;
 
+import obj.Attribute;
+
 import dk.brics.automaton.RegExp;
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.BasicOperations;
