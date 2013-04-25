@@ -46,8 +46,9 @@ public class Test {
 //			for (TransitionInfo ti : gpl.getEdgeList())
 //				System.out.println(ti.getFrom().getName()+" "+ti.getTo().getName());
 //		}
-		String test = "abc";
-		System.out.println(test);
+		String test = "'('\"key1\"~\"'[(a)b]'\"')'&&abc";
+		String testsplit[] = test.split("'\\('|'\\)'");
+		System.out.println(testsplit[0]+" "+testsplit[1]+" "+testsplit[2]);
 		
 		Attribute a = new SpecAttribute("","","","");
 		System.out.println(a.getClass());

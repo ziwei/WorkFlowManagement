@@ -25,6 +25,7 @@ public class Plotter {
 	 public void VerticesToDOT(){
 		 for (HandlerInfo hi : graph.vertexSet()){
 			 if (hi.isAcyclic() == true){
+				 System.out.println("expr "+hi.getInputExpr());
 				 gv.add(hi.getName()+"[label=\"<Handler>"+hi.getName()+"|{<Input>"+Escape(hi.getInputExpr())+"|<Output>"+Escape(hi.getOutputExpr())+"}\"]");
 			 }
 			 else {
@@ -54,8 +55,8 @@ public class Plotter {
 		 }
 	 }
 	 private String Escape(String expr){
-		 String newstr = expr.replaceAll("\\|", "\\\\|").replaceAll("\\<", "\\\\<")
-				 .replaceAll("\\>", "\\\\>").replaceAll("\\{", "\\\\{").replaceAll("\\}", "\\\\}");
+		 String newstr = expr.replaceAll("\\|", "\\\\|").replaceAll("\\<", "\\\\<").replaceAll("'\\('", "\\(").replaceAll("'\\)'", "\\)")
+				.replaceAll("\\>", "\\\\>").replaceAll("\\{", "\\\\{").replaceAll("\\}", "\\\\}").replaceAll("\"", "");
 		 return newstr;
 	 }
 	 public void ExportDot(){

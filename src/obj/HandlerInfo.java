@@ -87,24 +87,23 @@ public void setNewiExpr(String newiExpr) {
 }
 public List<Attribute> AtomExtractor (String expr, String flag){
 	List<Attribute> l = new ArrayList();
-	expr = expr.replaceAll("[()]", "");
-	String exprList[] = expr.split("[&|]");
+	expr = expr.replaceAll("'\\('|'\\)'", "");//distinguish () in logical expr and regex as '(' + ')'
+	String exprList[] = expr.split("&&|\\|\\|");
 	for(String kvpExpr : exprList){
-		String kvp[] = kvpExpr.split("'");
+		//System.out.println("kvpExpr "+kvpExpr);
+		String kvp[] = kvpExpr.split("\"");
 		if (kvp.length == 4){
-			l.add(new SpecAttribute(flag+l.size(),kvp[0],kvp[1],kvp[3]));
-		}
-		else if (kvp.length == 3){
-			l.add(new Attribute(flag+l.size(),kvp[0],kvp[1],kvp[2]));
+			if (kvp[3].startsWith("'"))
+				l.add(new Attribute(flag+l.size(),kvp[1],kvp[2],kvp[3].substring(1, kvp[3].length()-1)));
+			else
+				l.add(new SpecAttribute(flag+l.size(),kvp[1],kvp[2],kvp[3]));
 		}
 		else if (kvp.length == 2){
-			l.add(new Attribute(flag+l.size(),kvp[0],kvp[1],""));
-		}
-		else if (kvp.length == 1){
-			l.add(new Attribute(flag+l.size(),kvp[0],"ALL",""));
+			//System.out.println("enter");
+			l.add(new Attribute(flag+l.size(),kvp[1],"ALL",""));
 		}
 		atoms.put(flag+l.size(), kvpExpr);
-		System.out.println("Corrrrrect? " + kvpExpr);
+		//System.out.println("Corrrrrect? " + kvpExpr);
 	}
 	
 	//System.out.println(l.get(0).id+l.get(1).id+l.get(2).id);
@@ -113,19 +112,30 @@ public List<Attribute> AtomExtractor (String expr, String flag){
 public String ExpressionFormatter(List<Attribute> kvs, String expr){
 	for (Attribute attr : kvs){
 		String kv;
-		if (attr.getOperator().equals("ALL"))
-			kv= attr.getKey();
+		if (attr.getOperator().equals("ALL")){
+			//System.out.println("Corrrrrect? " + expr);
+			kv= "\""+attr.getKey()+"\"";
+		}
 		else{
-			if (attr.getClass().equals(SpecAttribute.class))
-				kv=attr.getKey()+"'"+attr.getOperator()+"''"+attr.getValue()+"'";
+			if (attr.getClass().equals(SpecAttribute.class)){
+				kv="\""+attr.getKey()+"\""+attr.getOperator()+"\""+attr.getValue()+"\"";
+			}
 			else
-				kv=attr.getKey()+"'"+attr.getOperator()+"'"+attr.getValue();
+				kv="\""+attr.getKey()+"\""+attr.getOperator()+"\"'"+attr.getValue()+"'\"";
+			//System.out.println("kv " + kv);
 		}
 			
 		//System.out.println("kv "+ Pattern.quote(kv));
 		String atom = attr.getId();
+		if (kv.contains("Quality")){
+			//System.out.println("error kv "+ kv);
+			//System.out.println("expr kv "+ Pattern.quote(kv));
+			//System.out.println("eerror atom "+ atom);
+			}
 		expr = expr.replaceAll(Pattern.quote(kv), atom); //literally escapping
+		
 	}
+	expr = expr.replaceAll("'\\('", "\\(").replaceAll("'\\)'", "\\)");
 	return expr;
 }
 }
