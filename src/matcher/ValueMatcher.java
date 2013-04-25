@@ -30,7 +30,7 @@ public class ValueMatcher {
 			else if (input.getOperator().equals("<")){
 				return output.getValue().compareTo(input.getValue())<0 ? implies : notImplies;
 			}
-			else if (input.getOperator().equals("<")){
+			else if (input.getOperator().equals("<=")){
 				return output.getValue().compareTo(input.getValue())<1 ? implies : notImplies;
 			}
 			else if (input.getOperator().equals("~")){
@@ -61,7 +61,7 @@ public class ValueMatcher {
 			else if (input.getOperator().equals("<")){
 				return minStr.compareTo(input.getValue())<0 ? implies : notImplies;
 			}
-			else if (input.getOperator().equals("<")){
+			else if (input.getOperator().equals("<=")){
 				return minStr.compareTo(input.getValue())<1 ? implies : notImplies;
 			}
 			else if (input.getOperator().equals("~")){

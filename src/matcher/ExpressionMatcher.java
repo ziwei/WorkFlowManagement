@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.regex.*;
 
 import obj.Attribute;
+import obj.SpecAttribute;
 
 import orbital.logic.functor.Predicates;
 import orbital.logic.imp.Formula;
@@ -26,7 +27,7 @@ public class ExpressionMatcher {
 	
 	public Map Prove(Formula[] axioms, String l, String r) throws IllegalArgumentException, ParseException{
 		Map res = new HashMap();
-		//System.out.println(l+" "+r);
+		System.out.println(l+" "+r);
 		String[] CFs = DNFSplit((Formula)logic.createExpression(l));
 		Formula right = (Formula)logic.createExpression(r);
 		//Formula fal = (Formula)logic.createExpression("false");
@@ -54,50 +55,120 @@ public class ExpressionMatcher {
 					res.put(lCNF.toString(), 2);
 			}
 		}	
-		//System.out.println(fImpl);
-		//return logic.inference().infer(statements.toArray(new Formula[statements.size()]), fImpl);
 		return res;
 	}
 	public Formula[] AxiomsGen(List<Attribute> output, List<Attribute> input) throws IllegalArgumentException, ParseException{
 		ArrayList<Formula> statements = new ArrayList<Formula>();
-		Iterator o = output.iterator();
-		while(o.hasNext()){
-			//String diffKeyState = "";
-			Attribute oAttr = (Attribute) o.next();
-			Iterator i = input.iterator();
-//			if (oAttr.value.startsWith("'")){
-//				String key1 = oAttr.key;
-//				String key2 = oAttr.value.substring(1, oAttr.value.length());
-//			}
-			//else{
-				while(i.hasNext()){
-					Attribute iAttr = (Attribute)i.next();
+		for(Attribute iAttr : input){
+			if (iAttr.getClass().equals(SpecAttribute.class)){
+				Attribute attr1 = null;
+				Attribute attr2 = null;
+				for(Attribute oAttr : output){
+					if (oAttr.getKey().equals(iAttr.getKey()))
+						attr1 = oAttr;
+					if (oAttr.getKey().equals(iAttr.getValue()))
+						attr2 = oAttr;
+					if (null != attr1 && null != attr2) {
+						String res = SpecValueMatch(attr1, attr2, (SpecAttribute)iAttr);
+						if (null != res){
+							Formula axiom  = (Formula)logic.createExpression(res);
+							statements.add(axiom);
+						}
+						break;
+					}
+				}
+			}
+			else if(iAttr.getClass().equals(Attribute.class)){
+				for(Attribute oAttr : output){
 					if (oAttr.getKey().equals(iAttr.getKey())){
-						//System.out.println("OK till here");
 						String sameKeyState = ValueMatcher.ValueMatch(oAttr, iAttr);
-						//System.out.println("OK till here4");
 						if (null != sameKeyState){
 							Formula fState  = (Formula)logic.createExpression(sameKeyState);
 							statements.add(fState);
 						}
 					}
+					
 				}
-			//}
-			//diffKeyState = "" + diffKeyState.substring(1) + "->!(" + oAttr.id + ")";
+			}
 		}
 		return statements.toArray(new Formula[statements.size()]);
 	}
+	private String SpecValueMatch(Attribute left, Attribute right, SpecAttribute sa){
+		String implies = left.getId()+"->("+right.getId()+")";
+		String notImplies = right.getId()+"->~("+left.getId()+")";
+		String lUpper = UpperBoundary(left.getOperator(), left.getValue());
+		String lLower = LowerBoundary(left.getOperator(), left.getValue());
+		String rUpper = UpperBoundary(right.getOperator(), right.getValue());
+		String rLower = LowerBoundary(right.getOperator(), right.getValue());
+		if (sa.getOperator().equals("=")){
+			return ValueMatcher.ValueMatch(left, right).equals(implies) ? sa.getId() : null;
+		}
+		else if (sa.getOperator().equals(">")){
+			if (null != lUpper){
+				if (null != rLower){
+					if (lUpper.compareTo(rLower) < 1)
+						return null;
+				}
+			}
+			return sa.getId();
+		}
+		else if (sa.getOperator().equals(">=")){
+			if (null != lUpper){
+				if (null != rLower){
+					if (lUpper.compareTo(rLower) < 1)
+						return null;
+				}
+			}
+			if (ValueMatcher.ValueMatch(left, right).equals(notImplies))
+			return null;
+			
+			return sa.getId();
+		}
+		else if (sa.getOperator().equals("<")){
+			if (null != lLower){
+				if (null != rUpper){
+					if (lLower.compareTo(rUpper) > -1)
+						return null;
+				}
+			}
+			return sa.getId();
+		}
+		else if (sa.getOperator().equals("<=")){
+			if (null != lLower){
+				if (null != rUpper){
+					if (lLower.compareTo(rUpper) > -1)
+						return null;
+				}
+			}
+			if (ValueMatcher.ValueMatch(left, right).equals(notImplies))
+				return null;
+				
+				return sa.getId();
+		}
+		return null;
+	}
+	private String UpperBoundary(String oper, String value){
+		if (oper.equals(">") || oper.equals(">=")){
+			return null;
+		}
+		else if (oper.equals("=") || oper.equals("<") || oper.endsWith("<=")){
+			return value;
+		}
+		return null;
+	}
+	private String LowerBoundary(String oper, String value){
+		if (oper.equals("<") || oper.equals("<=")){
+			return null;
+		}
+		else if (oper.equals("=") || oper.equals(">") || oper.endsWith(">=")){
+			return value;
+		}
+		return null;
+	}
 	private String[] DNFSplit(Formula f){
-		//Formula left=null;
-		//Formula right=null;
-		//Formula comp=null;
-	
 		Formula formula = ClassicalLogic.Utilities.disjunctiveForm(f, true);
 		String DNF = formula.toString();
 		String[] CFs = DNF.split("\\s\\|\\s");
-			//right = (Formula)logic.createExpression(r);
-			//comp = left.impl(right);
-		//System.out.println(lCNFs[0]+" "+lCNFs[1]);
 		return CFs;
 	}
 	public String DNFTransfer(String formula) throws IllegalArgumentException, ParseException{
@@ -106,13 +177,9 @@ public class ExpressionMatcher {
 	}
 	
 	private String[] CNFSplit(Formula f){
-	
 		Formula fomula = ClassicalLogic.Utilities.conjunctiveForm(f, true);
 		String CNF = fomula.toString();
 		String[] DFs = CNF.split("\\s\\&\\s");
-			//right = (Formula)logic.createExpression(r);
-			//comp = left.impl(right);
-		//System.out.println(lCNFs[0]+" "+lCNFs[1]);
 		return DFs;
 	}
 	
