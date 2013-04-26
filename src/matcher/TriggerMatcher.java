@@ -62,12 +62,12 @@ public class TriggerMatcher {
 		plotter.EdgesToDOT();
 		plotter.ExportDot();
 		
-		List<GraphPath> lPaths = gg.getPaths(handlers.get(0), handlers.get(4));
-		for (GraphPath<HandlerInfo, TransitionInfo> gpl : lPaths){
-			for (TransitionInfo ti : gpl.getEdgeList())
-				System.out.print(ti.getFrom().getName()+"->"+ti.getTo().getName()+" ");
-			System.out.println();
-		}
+//		List<GraphPath> lPaths = gg.getPaths(handlers.get(0), handlers.get(1));
+//		for (GraphPath<HandlerInfo, TransitionInfo> gpl : lPaths){
+//			for (TransitionInfo ti : gpl.getEdgeList())
+//				System.out.print(ti.getFrom().getName()+"->"+ti.getTo().getName()+" ");
+//			System.out.println();
+//		}
 	}
 	
 	public static void TriggerDisplay(Map<String, Integer> triggers){
@@ -102,7 +102,7 @@ public class TriggerMatcher {
 		String outputExpr;
 		List<HandlerInfo> handlers = new ArrayList();
 		//for (int i = 1; i <= num; ++i){
-			br = new BufferedReader(new FileReader("test/1.txt"));
+			br = new BufferedReader(new FileReader("test/2.txt"));
 			//System.out.println("OK till here" + num);
 			while ((name = br.readLine()) != null){
 				inputExpr = br.readLine();

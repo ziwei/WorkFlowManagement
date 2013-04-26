@@ -26,10 +26,10 @@ public class Plotter {
 		 for (HandlerInfo hi : graph.vertexSet()){
 			 if (hi.isAcyclic() == true){
 				 System.out.println("expr "+hi.getInputExpr());
-				 gv.add(hi.getName()+"[label=\"<Handler>"+hi.getName()+"|{<Input>"+Escape(hi.getInputExpr())+"|<Output>"+Escape(hi.getOutputExpr())+"}\"]");
+				 gv.add(hi.getName()+"[label=\"<Handler>"+hi.getName()+"|{<Input>"+Format(hi.getInputExpr())+"|<Output>"+Format(hi.getOutputExpr())+"}\"]");
 			 }
 			 else {
-				 gv.add(hi.getName()+"[color=red label=\"<Handler>"+hi.getName()+"|{<Input>"+Escape(hi.getInputExpr())+"|<Output>"+Escape(hi.getOutputExpr())+"}\"]");
+				 gv.add(hi.getName()+"[color=red label=\"<Handler>"+hi.getName()+"|{<Input>"+Format(hi.getInputExpr())+"|<Output>"+Format(hi.getOutputExpr())+"}\"]");
 			 }
 		 }
 	 }
@@ -54,10 +54,18 @@ public class Plotter {
 			 }
 		 }
 	 }
-	 private String Escape(String expr){
-		 String newstr = expr.replaceAll("\\|", "\\\\|").replaceAll("\\<", "\\\\<").replaceAll("'\\('", "\\(").replaceAll("'\\)'", "\\)")
+	 private String Format(String expr){
+		 expr = expr.replaceAll("\\|", "\\\\|").replaceAll("\\<", "\\\\<").replaceAll("'\\('", "\\(").replaceAll("'\\)'", "\\)")
 				.replaceAll("\\>", "\\\\>").replaceAll("\\{", "\\\\{").replaceAll("\\}", "\\\\}").replaceAll("\"", "");
-		 return newstr;
+		 if (expr.length() >= 50){
+			 int offset = expr.length()/2+1;
+			 if (expr.charAt(offset-1)=='\\')
+				 offset++;
+			 String newstr = expr.substring(0, offset)+"\\n"+expr.substring(offset, expr.length());
+			 return newstr;/////check before cut
+		 }
+		 else
+			 return expr;
 	 }
 	 public void ExportDot(){
 		 String type = "png";

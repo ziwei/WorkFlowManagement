@@ -91,18 +91,19 @@ public List<Attribute> AtomExtractor (String expr, String flag){
 	String exprList[] = expr.split("&&|\\|\\|");
 	for(String kvpExpr : exprList){
 		//System.out.println("kvpExpr "+kvpExpr);
+		String id = flag+l.size();
 		String kvp[] = kvpExpr.split("\"");
 		if (kvp.length == 4){
 			if (kvp[3].startsWith("'"))
-				l.add(new Attribute(flag+l.size(),kvp[1],kvp[2],kvp[3].substring(1, kvp[3].length()-1)));
+				l.add(new Attribute(id, kvp[1],kvp[2],kvp[3].substring(1, kvp[3].length()-1)));
 			else
-				l.add(new SpecAttribute(flag+l.size(),kvp[1],kvp[2],kvp[3]));
+				l.add(new SpecAttribute(id,kvp[1],kvp[2],kvp[3]));
 		}
 		else if (kvp.length == 2){
 			//System.out.println("enter");
-			l.add(new Attribute(flag+l.size(),kvp[1],"ALL",""));
+			l.add(new Attribute(id,kvp[1],"ALL",""));
 		}
-		atoms.put(flag+l.size(), kvpExpr);
+		atoms.put(id, kvpExpr);
 		//System.out.println("Corrrrrect? " + kvpExpr);
 	}
 	

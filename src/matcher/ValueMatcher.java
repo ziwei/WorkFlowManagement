@@ -3,6 +3,7 @@ package matcher;
 import java.util.List;
 
 import obj.Attribute;
+import obj.SpecAttribute;
 
 import dk.brics.automaton.RegExp;
 import dk.brics.automaton.Automaton;
@@ -174,6 +175,96 @@ public class ValueMatcher {
 		}
 		else if (output.getOperator().equals("ALL")) return implies;
 		
+		return null;
+	}
+	
+	public static String SpecValueMatch(Attribute leftHigh, Attribute leftLow, Attribute rightHigh, Attribute rightLow, SpecAttribute sa){
+		//String implies = left.getId()+"->("+right.getId()+")";
+		//String notImplies = right.getId()+"->~("+left.getId()+")";
+		String lUpper = null;
+		if (null != leftHigh)
+			lUpper = UpperBoundary(leftHigh.getOperator(), leftHigh.getValue());
+		String lLower = null;
+		if (null != leftLow)
+			lLower = LowerBoundary(leftLow.getOperator(), leftLow.getValue());
+		String rUpper = null;
+		if (null != rightHigh)
+			rUpper = UpperBoundary(rightHigh.getOperator(), rightHigh.getValue());
+		String rLower = null;
+		if (null != rightLow)
+			rLower = LowerBoundary(rightLow.getOperator(), rightLow.getValue());
+		System.out.println("lUpper " + lUpper);
+		System.out.println("rLower " + rLower);
+		if (sa.getOperator().equals("=")){
+			if (ValueMatcher.ValueMatch(leftHigh, rightLow).equals(leftHigh.getId()+"->("+rightLow.getId()+")"))
+				return sa.getId();
+			else if (ValueMatcher.ValueMatch(leftLow, rightHigh).equals(leftLow.getId()+"->("+rightHigh.getId()+")"))
+				return sa.getId();
+			else
+				return null;
+		}
+		else if (sa.getOperator().equals(">")){
+			if (null != lUpper){
+				if (null != rLower){
+					if (lUpper.compareTo(rLower) < 1)
+						return null;
+				}
+			}
+			return sa.getId();
+		}
+		else if (sa.getOperator().equals(">=")){
+			if (null != lUpper){
+				if (null != rLower){
+					if (lUpper.compareTo(rLower) < 1)
+						return null;
+				}
+			}
+			if (ValueMatcher.ValueMatch(leftHigh, rightLow).equals(rightLow.getId()+"->~("+leftHigh.getId()+")") && 
+					ValueMatcher.ValueMatch(leftLow, rightHigh).equals(rightHigh.getId()+"->~("+leftLow.getId()+")"))
+				return null;
+			
+			return sa.getId();
+		}
+		else if (sa.getOperator().equals("<")){
+			if (null != lLower){
+				if (null != rUpper){
+					if (lLower.compareTo(rUpper) > -1)
+						return null;
+				}
+			}
+			return sa.getId();
+		}
+		else if (sa.getOperator().equals("<=")){
+			if (null != lLower){
+				if (null != rUpper){
+					if (lLower.compareTo(rUpper) > -1)
+						return null;
+				}
+			}
+			if (ValueMatcher.ValueMatch(leftHigh, rightLow).equals(rightLow.getId()+"->~("+leftHigh.getId()+")") && 
+					ValueMatcher.ValueMatch(leftLow, rightHigh).equals(rightHigh.getId()+"->~("+leftLow.getId()+")"))
+				return null;
+				
+				return sa.getId();
+		}
+		return null;
+	}
+	private static String UpperBoundary(String oper, String value){
+		if (oper.equals(">") || oper.equals(">=")){
+			return null;
+		}
+		else if (oper.equals("=") || oper.equals("<") || oper.endsWith("<=")){
+			return value;
+		}
+		return null;
+	}
+	private static String LowerBoundary(String oper, String value){
+		if (oper.equals("<") || oper.equals("<=")){
+			return null;
+		}
+		else if (oper.equals("=") || oper.equals(">") || oper.endsWith(">=")){
+			return value;
+		}
 		return null;
 	}
 	

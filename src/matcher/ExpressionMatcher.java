@@ -61,22 +61,30 @@ public class ExpressionMatcher {
 		ArrayList<Formula> statements = new ArrayList<Formula>();
 		for(Attribute iAttr : input){
 			if (iAttr.getClass().equals(SpecAttribute.class)){
-				Attribute attr1 = null;
-				Attribute attr2 = null;
+				Attribute leftHigh = null;
+				Attribute leftLow = null;
+				Attribute rightHigh = null;
+				Attribute rightLow = null;
 				for(Attribute oAttr : output){
-					if (oAttr.getKey().equals(iAttr.getKey()))
-						attr1 = oAttr;
-					if (oAttr.getKey().equals(iAttr.getValue()))
-						attr2 = oAttr;
-					if (null != attr1 && null != attr2) {
-						String res = SpecValueMatch(attr1, attr2, (SpecAttribute)iAttr);
-						if (null != res){
-							Formula axiom  = (Formula)logic.createExpression(res);
-							statements.add(axiom);
-						}
-						break;
+					if (oAttr.getKey().equals(iAttr.getKey())){
+						if (leftHigh == null || oAttr.getValue().compareTo(leftHigh.getValue()) > 0)
+							leftHigh = oAttr;
+						if (leftLow == null || oAttr.getValue().compareTo(leftLow.getValue()) < 0)
+							leftLow = oAttr;
+					}
+					if (oAttr.getKey().equals(iAttr.getValue())){
+						if (rightHigh == null || oAttr.getValue().compareTo(rightHigh.getValue()) > 0)
+							rightHigh = oAttr;
+						if (rightLow == null || oAttr.getValue().compareTo(rightLow.getValue()) < 0)
+							rightLow = oAttr;
 					}
 				}
+				String res = ValueMatcher.SpecValueMatch(leftHigh, leftLow, rightHigh, rightLow, (SpecAttribute)iAttr);
+				if (null != res){
+					Formula axiom  = (Formula)logic.createExpression(res);
+					statements.add(axiom);
+				}
+				
 			}
 			else if(iAttr.getClass().equals(Attribute.class)){
 				for(Attribute oAttr : output){
@@ -93,78 +101,7 @@ public class ExpressionMatcher {
 		}
 		return statements.toArray(new Formula[statements.size()]);
 	}
-	private String SpecValueMatch(Attribute left, Attribute right, SpecAttribute sa){
-		String implies = left.getId()+"->("+right.getId()+")";
-		String notImplies = right.getId()+"->~("+left.getId()+")";
-		String lUpper = UpperBoundary(left.getOperator(), left.getValue());
-		String lLower = LowerBoundary(left.getOperator(), left.getValue());
-		String rUpper = UpperBoundary(right.getOperator(), right.getValue());
-		String rLower = LowerBoundary(right.getOperator(), right.getValue());
-		if (sa.getOperator().equals("=")){
-			return ValueMatcher.ValueMatch(left, right).equals(implies) ? sa.getId() : null;
-		}
-		else if (sa.getOperator().equals(">")){
-			if (null != lUpper){
-				if (null != rLower){
-					if (lUpper.compareTo(rLower) < 1)
-						return null;
-				}
-			}
-			return sa.getId();
-		}
-		else if (sa.getOperator().equals(">=")){
-			if (null != lUpper){
-				if (null != rLower){
-					if (lUpper.compareTo(rLower) < 1)
-						return null;
-				}
-			}
-			if (ValueMatcher.ValueMatch(left, right).equals(notImplies))
-			return null;
-			
-			return sa.getId();
-		}
-		else if (sa.getOperator().equals("<")){
-			if (null != lLower){
-				if (null != rUpper){
-					if (lLower.compareTo(rUpper) > -1)
-						return null;
-				}
-			}
-			return sa.getId();
-		}
-		else if (sa.getOperator().equals("<=")){
-			if (null != lLower){
-				if (null != rUpper){
-					if (lLower.compareTo(rUpper) > -1)
-						return null;
-				}
-			}
-			if (ValueMatcher.ValueMatch(left, right).equals(notImplies))
-				return null;
-				
-				return sa.getId();
-		}
-		return null;
-	}
-	private String UpperBoundary(String oper, String value){
-		if (oper.equals(">") || oper.equals(">=")){
-			return null;
-		}
-		else if (oper.equals("=") || oper.equals("<") || oper.endsWith("<=")){
-			return value;
-		}
-		return null;
-	}
-	private String LowerBoundary(String oper, String value){
-		if (oper.equals("<") || oper.equals("<=")){
-			return null;
-		}
-		else if (oper.equals("=") || oper.equals(">") || oper.endsWith(">=")){
-			return value;
-		}
-		return null;
-	}
+	
 	private String[] DNFSplit(Formula f){
 		Formula formula = ClassicalLogic.Utilities.disjunctiveForm(f, true);
 		String DNF = formula.toString();
