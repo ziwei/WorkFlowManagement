@@ -102,7 +102,7 @@ public class TriggerMatcher {
 		String outputExpr;
 		List<HandlerInfo> handlers = new ArrayList();
 		//for (int i = 1; i <= num; ++i){
-			br = new BufferedReader(new FileReader("test/2.txt"));
+			br = new BufferedReader(new FileReader("test/1.txt"));
 			//System.out.println("OK till here" + num);
 			while ((name = br.readLine()) != null){
 				inputExpr = br.readLine();

@@ -66,17 +66,19 @@ public class ExpressionMatcher {
 				Attribute rightHigh = null;
 				Attribute rightLow = null;
 				for(Attribute oAttr : output){
-					if (oAttr.getKey().equals(iAttr.getKey())){
-						if (leftHigh == null || oAttr.getValue().compareTo(leftHigh.getValue()) > 0)
-							leftHigh = oAttr;
-						if (leftLow == null || oAttr.getValue().compareTo(leftLow.getValue()) < 0)
-							leftLow = oAttr;
-					}
-					if (oAttr.getKey().equals(iAttr.getValue())){
-						if (rightHigh == null || oAttr.getValue().compareTo(rightHigh.getValue()) > 0)
-							rightHigh = oAttr;
-						if (rightLow == null || oAttr.getValue().compareTo(rightLow.getValue()) < 0)
-							rightLow = oAttr;
+					if (!oAttr.getKey().equals("N/A")){
+						if (oAttr.getKey().equals(iAttr.getKey())){
+							if (leftHigh == null || oAttr.getValue().compareTo(leftHigh.getValue()) > 0)
+								leftHigh = oAttr;
+							if (leftLow == null || oAttr.getValue().compareTo(leftLow.getValue()) < 0)
+								leftLow = oAttr;
+						}
+						if (oAttr.getKey().equals(iAttr.getValue())){
+							if (rightHigh == null || oAttr.getValue().compareTo(rightHigh.getValue()) > 0)
+								rightHigh = oAttr;
+							if (rightLow == null || oAttr.getValue().compareTo(rightLow.getValue()) < 0)
+								rightLow = oAttr;
+						}
 					}
 				}
 				String res = ValueMatcher.SpecValueMatch(leftHigh, leftLow, rightHigh, rightLow, (SpecAttribute)iAttr);
@@ -99,6 +101,7 @@ public class ExpressionMatcher {
 				}
 			}
 		}
+		//System.out.println(statements);
 		return statements.toArray(new Formula[statements.size()]);
 	}
 	

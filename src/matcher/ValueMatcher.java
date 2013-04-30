@@ -16,6 +16,8 @@ import dk.brics.automaton.Transition;
 public class ValueMatcher {
 	public static final int LIMIT = 25;
 	public static String ValueMatch(Attribute output, Attribute input){
+		if (null == output || null == input)
+			return null;
 		String implies = output.getId()+"->("+input.getId()+")";
 		String notImplies = input.getId()+"->~("+output.getId()+")";
 		if (output.getOperator().equals("=")){
@@ -23,6 +25,7 @@ public class ValueMatcher {
 				return output.getValue().equals(input.getValue()) ? implies : notImplies;
 			}
 			else if (input.getOperator().equals(">")){
+				//System.out.println("error might be "+ output.getValue()+" "+(input.getValue())+" "+output.getValue().compareTo(input.getValue()));
 				return output.getValue().compareTo(input.getValue())>0 ? implies : notImplies;
 			}
 			else if (input.getOperator().equals(">=")){
@@ -196,9 +199,9 @@ public class ValueMatcher {
 		System.out.println("lUpper " + lUpper);
 		System.out.println("rLower " + rLower);
 		if (sa.getOperator().equals("=")){
-			if (ValueMatcher.ValueMatch(leftHigh, rightLow).equals(leftHigh.getId()+"->("+rightLow.getId()+")"))
+			if ((null != leftHigh && null != rightLow) && ValueMatcher.ValueMatch(leftHigh, rightLow).equals(leftHigh.getId()+"->("+rightLow.getId()+")"))
 				return sa.getId();
-			else if (ValueMatcher.ValueMatch(leftLow, rightHigh).equals(leftLow.getId()+"->("+rightHigh.getId()+")"))
+			else if ((null != leftLow && null != rightHigh) && ValueMatcher.ValueMatch(leftLow, rightHigh).equals(leftLow.getId()+"->("+rightHigh.getId()+")"))
 				return sa.getId();
 			else
 				return null;
